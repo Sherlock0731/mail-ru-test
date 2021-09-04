@@ -48,9 +48,7 @@ apply plugin: 'nebula.source-jar'
 apply plugin: 'nebula.javadoc-jar'
 
 group = 'ru.sbtqa.tests'
-
 description = "overcast-autotest-ui"
-
 generateRunner.glue = ["ru.sbtqa.steps", "steps"]
 
 sourceCompatibility = 1.8
