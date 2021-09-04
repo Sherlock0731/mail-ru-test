@@ -135,7 +135,7 @@ bintray {
 test {
     maxParallelForks = 1
     ignoreFailures = true
-    jvmArgs += "-Dprofile=${profile}"
+    //jvmArgs += "-Dprofile=${profile}"
     jvmArgs += "-Dselenide.pageLoadStrategy=none"
 
     //путь к классу с кастомными настройками драйвера.
@@ -155,9 +155,9 @@ test {
     if (browser) {
         jvmArgs += "-Dbrowser=${browser}"
     }
-    if (remoteUrl) {
-        jvmArgs += "-DremoteUrl=${remoteUrl}" //url для удаленного зауска тестов
-    }
+    //if (remoteUrl) {
+    //    jvmArgs += "-DremoteUrl=${remoteUrl}" //url для удаленного запуска тестов
+    //}
     if (browserVersion) {
         jvmArgs += "-DbrowserVersion=${browserVersion}"
     }
