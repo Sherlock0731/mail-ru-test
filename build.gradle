@@ -149,9 +149,9 @@ test {
     jvmArgs += "-Dgalen.browser.screenshots.fullPage=true"
     jvmArgs += "-Dgalen.browser.screenshots.fullPage.scrollWait=50"
 
-    if (tag) {
-        jvmArgs += "-Dcucumber.options=--tags ${tag}" //параметр для запуска тестов с использование тэгов
-    }
+    //if (tag) {
+    //    jvmArgs += "-Dcucumber.options=--tags ${tag}" //параметр для запуска тестов с использование тэгов
+    //}
     if (browser) {
         jvmArgs += "-Dbrowser=${browser}"
     }
