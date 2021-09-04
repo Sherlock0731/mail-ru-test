@@ -152,24 +152,24 @@ test {
     //if (tag) {
     //    jvmArgs += "-Dcucumber.options=--tags ${tag}" //параметр для запуска тестов с использование тэгов
     //}
-    if (browser) {
+    //if (browser) {
         jvmArgs += "-Dbrowser=chrome"
-    }
+    //}
     //if (remoteUrl) {
     //    jvmArgs += "-DremoteUrl=${remoteUrl}" //url для удаленного запуска тестов
     //}
     //if (browserVersion) {
     //    jvmArgs += "-DbrowserVersion=${browserVersion}"
     //}
-    if (height) {
+    //if (height) {
         jvmArgs += "-Dheight=900" //высота окна браузера
-    }
-    if (width) {
+    //}
+    //if (width) {
         jvmArgs += "-Dwidth=1600" //ширина окна браузера
-    }
-    if (maximized) {
+    //}
+    //if (maximized) {
         jvmArgs += "-Dselenide.startMaximized=true"
-    }
+    //}
     //if (width && height) {
     //    jvmArgs += "-Dselenide.browserSize=${width}x${height}"
     //}
