@@ -1,0 +1,199 @@
+buildscript {
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.4.9"
+        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.1'
+        classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.10.0'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
+        classpath 'ru.alfalab.gradle:cucumber-reporting-gradle-plugin:0.1.0'
+        classpath 'ru.alfalab.gradle:cucumber-parallel-test-gradle-plugin:0.3.1'
+
+        classpath 'com.netflix.nebula:nebula-release-plugin:4.1.0'
+        classpath 'com.netflix.nebula:gradle-info-plugin:3.2.1'
+        classpath 'com.netflix.nebula:gradle-extra-configurations-plugin:3.3.0'
+        classpath 'com.netflix.nebula:nebula-publishing-plugin:4.9.1'
+    }
+}
+
+repositories {
+    maven {
+        url "https://dl.bintray.com/alfa-laboratory/maven-releases"
+    }
+    mavenLocal()
+    jcenter()
+    mavenCentral()
+}
+
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'groovy'
+apply plugin: 'idea'
+apply plugin: 'base'
+apply plugin: 'maven-publish'
+apply plugin: 'jacoco'
+apply plugin: 'com.github.kt3k.coveralls'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'distribution'
+apply plugin: 'ru.alfalab.cucumber-reporting'
+apply plugin: 'ru.alfalab.cucumber-parallel-test'
+
+// ==== nebula
+apply plugin: 'nebula.release'
+apply plugin: 'nebula.maven-publish'
+apply plugin: 'nebula.source-jar'
+apply plugin: 'nebula.javadoc-jar'
+
+group = 'ru.sbtqa.tests'
+
+description = "overcast-autotest-ui"
+
+generateRunner.glue = ["ru.sbtqa.steps", "steps"]
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+project.ext {
+    cucumberVersion = '2.4.0'
+    selenideVersion = '5.2.2'
+}
+
+dependencies {
+    compile group: 'org.hamcrest', name: 'hamcrest-library', version: '2.1'
+    compile group: 'org.codehaus.groovy', name: 'groovy', version: '2.4.8'
+    compile group: 'org.reflections', name: 'reflections', version: '0.9.10'
+    compile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.3.2'
+    compile group: 'com.codeborne', name: 'selenide', version: selenideVersion
+    compile group: 'io.cucumber', name: 'cucumber-java', version: cucumberVersion
+    compile group: 'io.cucumber', name: 'cucumber-core', version: cucumberVersion
+    compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.21'
+    compile group: 'org.projectlombok', name: 'lombok', version: '1.16.10'
+    compile group: 'io.rest-assured', name: 'rest-assured', version: '3.0.2'
+    compile group: 'com.google.inject', name: 'guice', version: '4.1.0'
+    compile group: 'com.galenframework', name: 'galen-java-support', version: '2.3.6'
+    compile group: 'com.jayway.jsonpath', name: 'json-path', version: '2.4.0'
+
+    testCompile "org.mockito:mockito-core:2.13.0"
+    testCompile "org.mockito:mockito-inline:2.13.0"
+    testCompile "com.github.tomakehurst:wiremock-standalone:2.15.0"
+}
+
+compileJava.options.encoding = 'UTF-8'
+compileTestJava.options.encoding = 'UTF-8'
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+
+            artifact javadocJar {
+                classifier "javadoc"
+            }
+
+            artifact sourceJar {
+                classifier "sources"
+            }
+        }
+    }
+}
+
+ext {
+    bintrayUserName = (project.hasProperty('BINTRAY_USERNAME') ? project.findProperty('BINTRAY_USERNAME') : System.getenv()['BINTRAY_USERNAME'])
+    bintrayPassword = (project.hasProperty('BINTRAY_PASSWORD') ? project.findProperty('BINTRAY_PASSWORD') : System.getenv()['BINTRAY_PASSWORD'])
+    bintrayRepository = (project.hasProperty('BINTRAY_REPOSITORY') ? project.findProperty('BINTRAY_REPOSITORY') : System.getenv()['BINTRAY_REPOSITORY'])
+}
+
+bintray {
+    user = bintrayUserName
+    key = bintrayPassword
+    publications = ['nebula']
+    dryRun = false
+    publish = true
+    pkg {
+        userOrg = 'alfa-laboratory'
+        repo = 'maven-releases'
+        name = 'akita'
+        desc = project.description
+        websiteUrl = 'https://github.com/alfa-laboratory/akita'
+        issueTrackerUrl = 'https://github.com/alfa-laboratory/akita/issues'
+        vcsUrl = 'https://github.com/alfa-laboratory/akita.git'
+        licenses = ['Apache-2.0']
+        labels = ['gradle', 'nebula']
+        publicDownloadNumbers = true
+        attributes = [:]
+        version {
+            name = project.version
+            vcsTag = project.version
+            attributes = [:]
+        }
+    }
+}
+
+test {
+    maxParallelForks = 1
+    ignoreFailures = true
+    jvmArgs += "-Dprofile=${profile}"
+    jvmArgs += "-Dselenide.pageLoadStrategy=none"
+
+    //путь к классу с кастомными настройками драйвера.
+    jvmArgs += "-Dselenide.browser=ru.sbtqa.tests.core.drivers.CustomDriverProvider"
+
+    //явная установка пути до chromedriver.exe на компьютере
+    //для linux это выглядит так "-Dwebdriver.chrome.driver=/usr/bin/chromedriver"
+    jvmArgs += "-Dwebdriver.chrome.driver=C:\\Program Files (x86)\\ChromeDriver\\chromedriver.exe"
+
+    //параметры galen framework для возможности скролла страницы и снятния полного скриншота страницы
+    jvmArgs += "-Dgalen.browser.screenshots.fullPage=true"
+    jvmArgs += "-Dgalen.browser.screenshots.fullPage.scrollWait=50"
+
+    if (tag) {
+        jvmArgs += "-Dcucumber.options=--tags ${tag}" //параметр для запуска тестов с использование тэгов
+    }
+    if (browser) {
+        jvmArgs += "-Dbrowser=${browser}"
+    }
+    if (remoteUrl) {
+        jvmArgs += "-DremoteUrl=${remoteUrl}" //url для удаленного зауска тестов
+    }
+    if (browserVersion) {
+        jvmArgs += "-DbrowserVersion=${browserVersion}"
+    }
+    if (height) {
+        jvmArgs += "-Dheight=${height}" //высота окна браузера
+    }
+    if (width) {
+        jvmArgs += "-Dwidth=${width}" //ширина окна браузера
+    }
+    if (maximized) {
+        jvmArgs += "-Dselenide.startMaximized=${maximized}"
+    }
+    if (width && height) {
+        jvmArgs += "-Dselenide.browserSize=${width}x${height}"
+    }
+
+    reports {
+        html.enabled = false
+        junitXml.enabled = false
+    }
+}
+
+bintrayUpload.onlyIf {
+    !project.version.toString().toUpperCase().endsWith("-SNAPSHOT") && !project.version.toString().toUpperCase().contains("-DEV")
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        csv.enabled true
+        html.destination file("${buildDir}/jacocoHtml")
+    }
+}
+
+task makeZip(type: Zip) {
+    from('build/reports/cucumber') {
+        into("${project.version}-testReport")
+    }
+}
