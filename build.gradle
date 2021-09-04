@@ -148,31 +148,13 @@ test {
     //параметры galen framework для возможности скролла страницы и снятния полного скриншота страницы
     jvmArgs += "-Dgalen.browser.screenshots.fullPage=true"
     jvmArgs += "-Dgalen.browser.screenshots.fullPage.scrollWait=50"
-
-    //if (tag) {
-    //    jvmArgs += "-Dcucumber.options=--tags ${tag}" //параметр для запуска тестов с использование тэгов
-    //}
-    //if (browser) {
-        jvmArgs += "-Dbrowser=chrome"
-    //}
-    //if (remoteUrl) {
-    //    jvmArgs += "-DremoteUrl=${remoteUrl}" //url для удаленного запуска тестов
-    //}
-    //if (browserVersion) {
-    //    jvmArgs += "-DbrowserVersion=${browserVersion}"
-    //}
-    //if (height) {
-        jvmArgs += "-Dheight=900" //высота окна браузера
-    //}
-    //if (width) {
-        jvmArgs += "-Dwidth=1600" //ширина окна браузера
-    //}
-    //if (maximized) {
-        jvmArgs += "-Dselenide.startMaximized=true"
-    //}
-    //if (width && height) {
-    //    jvmArgs += "-Dselenide.browserSize=${width}x${height}"
-    //}
+    jvmArgs += "-Dcucumber.options=--tags @AuthorizationMailru" //параметр для запуска тестов с использование тэгов
+    jvmArgs += "-Dbrowser=chrome"
+    //jvmArgs += "-DremoteUrl=${remoteUrl}" //url для удаленного запуска тестов
+    jvmArgs += "-DbrowserVersion=92.0.4515.107"
+    jvmArgs += "-Dheight=900" //высота окна браузера
+    jvmArgs += "-Dwidth=1600" //ширина окна браузера
+    jvmArgs += "-Dselenide.startMaximized=true"
 
     reports {
         html.enabled = false
